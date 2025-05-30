@@ -14,7 +14,7 @@ module.exports = defineConfig({
       jwtSecret: process.env.JWT_SECRET || 'supersecret',
       cookieSecret: process.env.COOKIE_SECRET || 'supersecret'
     },
-    // redisUrl: process.env.REDIS_URL
+    redisUrl: process.env.REDIS_URL
   },
   modules: [
     { resolve: './src/modules/seller' },
@@ -79,6 +79,54 @@ module.exports = defineConfig({
             id: 'local',
             options: {
               channels: ['feed']
+            }
+          }
+        ]
+      }
+    },
+    // https://docs.medusajs.com/resources/infrastructure-modules/event
+    {
+      resolve: '@medusajs/medusa/event-bus-redis',
+      options: {
+        redisUrl: process.env.EVENTS_REDIS_URL
+      }
+    },
+    // https://docs.medusajs.com/resources/infrastructure-modules/file/s3
+    {
+      resolve: '@medusajs/medusa/file',
+      options: {
+        providers: [
+          {
+            resolve: '@medusajs/medusa/file-s3',
+            id: 's3',
+            options: {
+              file_url: process.env.S3_FILE_URL,
+              access_key_id: process.env.S3_ACCESS_KEY_ID,
+              secret_access_key: process.env.S3_SECRET_ACCESS_KEY,
+              region: process.env.S3_REGION,
+              bucket: process.env.S3_BUCKET,
+              endpoint: process.env.S3_ENDPOINT,
+              additional_client_config: {
+                // forcePathStyle: true // Additional Configuration for MinIO and Supabase#
+              }
+            }
+          }
+        ]
+      }
+    },
+    // https://docs.medusajs.com/resources/infrastructure-modules/locking/redis
+    {
+      resolve: '@medusajs/medusa/locking',
+      options: {
+        providers: [
+          {
+            resolve: '@medusajs/medusa/locking-redis',
+            id: 'locking-redis',
+            // set this if you want this provider to be used by default
+            // and you have other Locking Module Providers registered.
+            is_default: true,
+            options: {
+              redisUrl: process.env.LOCKING_REDIS_URL
             }
           }
         ]
