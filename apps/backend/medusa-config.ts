@@ -1,3 +1,5 @@
+import { TolgeeModuleConfig } from 'medusa-plugin-tolgee'
+
 import { defineConfig, loadEnv } from '@medusajs/framework/utils'
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
@@ -84,13 +86,7 @@ module.exports = defineConfig({
         ]
       }
     },
-    // https://docs.medusajs.com/resources/infrastructure-modules/event
-    {
-      resolve: '@medusajs/medusa/event-bus-redis',
-      options: {
-        redisUrl: process.env.EVENTS_REDIS_URL
-      }
-    },
+
     // https://docs.medusajs.com/resources/infrastructure-modules/file/s3
     {
       resolve: '@medusajs/medusa/file',
@@ -114,6 +110,13 @@ module.exports = defineConfig({
         ]
       }
     },
+    // https://docs.medusajs.com/resources/infrastructure-modules/event
+    {
+      resolve: '@medusajs/medusa/event-bus-redis',
+      options: {
+        redisUrl: process.env.EVENTS_REDIS_URL
+      }
+    },
     // https://docs.medusajs.com/resources/infrastructure-modules/locking/redis
     {
       resolve: '@medusajs/medusa/locking',
@@ -132,5 +135,24 @@ module.exports = defineConfig({
         ]
       }
     }
-  ]
+  ],
+  plugins: [
+    {
+      resolve: `medusa-plugin-tolgee`,
+      options: {
+        baseURL: process.env.TOLGEE_API_URL || 'https://tolgee.com',
+        apiKey: process.env.TOLGEE_API_KEY || 'tolgee_api_key',
+        projectId: process.env.TOLGEE_PROJECT_ID || 'tolgee_project_id',
+        keys: {
+          // Optional
+          product: ['title', 'subtitle', 'description'],
+          product_category: ['name', 'description']
+        },
+        tags: {
+          // Optional
+          product: ['custom_tag']
+        }
+      } satisfies TolgeeModuleConfig
+    }
+  ],
 })
